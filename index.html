@@ -1,1 +1,50 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mon Projet BTS CIEL</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #1e1e2e;
+            color: white;
+            text-align: center;
+            padding-top: 50px;
+        }
+        button {
+            padding: 15px 25px;
+            font-size: 18px;
+            background-color: #00b4d8;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0077b6;
+        }
+    </style>
+</head>
+<body>
 
+    <h1>Bienvenue sur mon projet de fin d'année</h1>
+    <p>Ce jeu est développé pour mon entrée en BTS CIEL.</p>
+    
+    <h2>Score : <span id="score">0</span></h2>
+    <button id="bouton-clic">Clique ici !</button>
+
+    <script>
+        // Le code JavaScript pour faire fonctionner le jeu ira ici
+        let score = 0;
+        const bouton = document.getElementById('bouton-clic');
+        const affichageScore = document.getElementById('score');
+
+        bouton.addEventListener('click', () => {
+            score++;
+            affichageScore.textContent = score;
+        });
+    </script>
+
+</body>
+</html>
