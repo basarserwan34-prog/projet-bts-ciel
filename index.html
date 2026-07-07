@@ -3,136 +3,134 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Console de Décryptage - BTS CIEL</title>
+    <title>Projet de Recrutement - BTS CIEL</title>
     <style>
         body {
-            font-family: 'Courier New', Courier, monospace;
-            background-color: #0a0f1d;
-            color: #00ff66;
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f9;
+            color: #333;
             text-align: center;
-            padding: 20px;
+            padding: 50px 20px;
         }
-        .terminal {
-            background-color: #05070b;
-            border: 2px solid #00ff66;
-            box-shadow: 0 0 15px #00ff66;
-            max-width: 600px;
-            margin: 30px auto;
-            padding: 20px;
-            border-radius: 5px;
-            text-align: left;
+        .box {
+            background-color: white;
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         }
-        h1 {
-            text-align: center;
-            color: #00ff66;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
-        .crypto-box {
-            font-size: 24px;
+        .code-mystere {
+            font-size: 28px;
             font-weight: bold;
-            background: #111;
+            letter-spacing: 5px;
+            background-color: #e9ecef;
             padding: 15px;
-            border-left: 5px solid #00ff66;
-            margin: 15px 0;
-            letter-spacing: 3px;
-            text-align: center;
+            margin: 20px 0;
+            border-radius: 5px;
         }
         input[type="text"] {
-            background: #000;
-            border: 1px solid #00ff66;
-            color: #00ff66;
             padding: 10px;
-            width: 70%;
-            font-family: inherit;
             font-size: 16px;
+            width: 60%;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            margin-right: 10px;
         }
         button {
-            background: #00ff66;
-            color: #000;
-            border: none;
             padding: 10px 20px;
-            font-family: inherit;
-            font-weight: bold;
-            cursor: pointer;
             font-size: 16px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
         }
         button:hover {
-            background: #00cc52;
+            background-color: #0056b3;
         }
-        .status {
-            margin-top: 15px;
+        .log {
+            margin-top: 20px;
+            font-style: italic;
+            color: #666;
+        }
+        .success {
+            color: #28a745;
             font-weight: bold;
+        }
+        .error {
+            color: #dc3545;
+            font-weight: bold;
+        }
+        .hidden {
+            display: none;
         }
     </style>
 </head>
 <body>
 
-    <h1>CIEL Cyber Terminal v1.0</h1>
-    <p>Mission : Décryptez le code réseau avant la fin du temps imparti.</p>
+    <div class="box">
+        <h2>Mini-jeu de décryptage (César +1)</h2>
+        <p>Projet d'application web réalisé pour mon dossier Parcoursup.</p>
+        <hr>
 
-    <div class="terminal">
-        <div>[ SYSTEM STATUS : EN LIGNE ]</div>
-        <div>[ INDICE : Chiffre de César (Décalage de +1) ]</div>
-        <div><em>Exemple : A devient B, B devient C...</em></div>
-        
-        <div class="crypto-box" id="code-chiffre">IFMMP</div>
-        
-        <label for="reponse">ENTRER LE CODE DÉCRYPTÉ :</label><br><br>
-        <input type="text" id="reponse" placeholder="Votre réponse ici..." autocomplete="off">
-        <button id="btn-valider">VALIDER</button>
+        <div id="zone-jeu">
+            <p id="consigne">Indice : Trouver le mot d'origine.</p>
+            <div class="code-mystere" id="affichage-code">TFSWFS</div>
+            
+            <input type="text" id="reponse-candidat" placeholder="Votre réponse en majuscules" autocomplete="off">
+            <button onclick="verifierReponse()">Valider</button>
+            
+            <p class="log" id="message-statut"></p>
+        </div>
 
-        <div class="status" id="statut-message"></div>
-        <div style="margin-top: 10px;">Score de décryptage : <span id="cyber-score">0</span></div>
+        <div id="zone-fin" class="hidden">
+            <h3 class="success">Félicitations !</h3>
+            <p>Vous avez décodé l'ensemble des données avec succès. Ce projet démontre ma motivation et ma capacité à comprendre la logique algorithmique essentielle pour réussir en BTS CIEL.</p>
+        </div>
     </div>
 
     <script>
-        // Liste de mots et leurs versions chiffrées (Décalage +1)
-        // HELLO -> IFMMP | CIEL -> DJFM | ROBOT -> SPCPU | CYBER -> DZCFS
-        const missions = [
-            { chiffre: "IFMMP", correct: "HELLO" },
-            { chiffre: "DJFM", correct: "CIEL" },
-            { chiffre: "SPCPU", correct: "ROBOT" },
-            { chiffre: "DZCFS", correct: "CYBER" }
+        // Le jeu contient exactement 2 missions
+        const jeux = [
+            { code: "TFSWFS", solution: "SERVER" },
+            { code: "OFUXPSL", solution: "NETWORK" }
         ];
 
-        let missionActuelle = 0;
-        let score = 0;
+        let etapeActuelle = 0;
 
-        const zoneCode = document.getElementById('code-chiffre');
-        const champReponse = document.getElementById('reponse');
-        const btnValider = document.getElementById('btn-valider');
-        const statutMessage = document.getElementById('statut-message');
-        const affichageScore = document.getElementById('cyber-score');
+        const affichageCode = document.getElementById('affichage-code');
+        const reponseCandidat = document.getElementById('reponse-candidat');
+        const messageStatut = document.getElementById('message-statut');
+        const zoneJeu = document.getElementById('zone-jeu');
+        const zoneFin = document.getElementById('zone-fin');
 
-        btnValider.addEventListener('click', () => {
-            let tentative = champReponse.value.toUpperCase().trim();
-            
-            if (tentative === missions[missionActuelle].correct) {
-                score += 10;
-                affichageScore.textContent = score;
-                statutMessage.style.color = "#00ff66";
-                statutMessage.textContent = "[ ACCÈS AUTORISÉ ] : Code correct ! Passage au niveau suivant...";
+        function verifierReponse() {
+            const saisie = reponseCandidat.value.toUpperCase().trim();
+
+            if (saisie === jeux[etapeActuelle].solution) {
+                etapeActuelle++;
+                reponseCandidat.value = "";
                 
-                // Passer à la mission suivante
-                missionActuelle++;
-                if (missionActuelle < missions.length) {
-                    setTimeout(() => {
-                        zoneCode.textContent = missions[missionActuelle].chiffre;
-                        champReponse.value = "";
-                        statutMessage.textContent = "";
-                    }, 1500);
+                if (etapeActuelle < jeux.length) {
+                    messageStatut.className = "log success";
+                    messageStatut.textContent = "Correct ! Passage au mot suivant.";
+                    affichageCode.textContent = jeux[etapeActuelle].code;
                 } else {
-                    setTimeout(() => {
-                        zoneCode.textContent = "BRAVO !";
-                        statutMessage.textContent = "[ SYSTÈME TOTALEMENT HACKÉ ] Félicitations !";
-                        champReponse.style.display = "none";
-                        btnValider.style.display = "none";
-                    }, 1500);
+                    // Fin du jeu après 2 mots trouvés
+                    zoneJeu.classList.add('hidden');
+                    zoneFin.classList.remove('hidden');
                 }
             } else {
-                statutMessage.style.color = "#ff3333";
-                statutMessage.textContent = "[ ACCÈS REFUSÉ ] : Code erroné. Réessayez.";
+                messageStatut.className = "log error";
+                messageStatut.textContent = "Code erroné, veuillez réessayer.";
+            }
+        }
+
+        // Permet de valider aussi en appuyant sur Entrée
+        reponseCandidat.addEventListener("keypress", function(e) {
+            if (e.key === "Enter") {
+                verifierReponse();
             }
         });
     </script>
