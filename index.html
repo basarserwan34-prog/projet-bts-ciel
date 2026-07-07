@@ -3,46 +3,137 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mon Projet BTS CIEL</title>
+    <title>Console de Décryptage - BTS CIEL</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background-color: #1e1e2e;
-            color: white;
+            font-family: 'Courier New', Courier, monospace;
+            background-color: #0a0f1d;
+            color: #00ff66;
             text-align: center;
-            padding-top: 50px;
+            padding: 20px;
+        }
+        .terminal {
+            background-color: #05070b;
+            border: 2px solid #00ff66;
+            box-shadow: 0 0 15px #00ff66;
+            max-width: 600px;
+            margin: 30px auto;
+            padding: 20px;
+            border-radius: 5px;
+            text-align: left;
+        }
+        h1 {
+            text-align: center;
+            color: #00ff66;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        .crypto-box {
+            font-size: 24px;
+            font-weight: bold;
+            background: #111;
+            padding: 15px;
+            border-left: 5px solid #00ff66;
+            margin: 15px 0;
+            letter-spacing: 3px;
+            text-align: center;
+        }
+        input[type="text"] {
+            background: #000;
+            border: 1px solid #00ff66;
+            color: #00ff66;
+            padding: 10px;
+            width: 70%;
+            font-family: inherit;
+            font-size: 16px;
         }
         button {
-            padding: 15px 25px;
-            font-size: 18px;
-            background-color: #00b4d8;
-            color: white;
+            background: #00ff66;
+            color: #000;
             border: none;
-            border-radius: 5px;
+            padding: 10px 20px;
+            font-family: inherit;
+            font-weight: bold;
             cursor: pointer;
+            font-size: 16px;
         }
         button:hover {
-            background-color: #0077b6;
+            background: #00cc52;
+        }
+        .status {
+            margin-top: 15px;
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
 
-    <h1>Bienvenue sur mon projet de fin d'année</h1>
-    <p>Ce jeu est développé pour mon entrée en BTS CIEL.</p>
-    
-    <h2>Score : <span id="score">0</span></h2>
-    <button id="bouton-clic">Clique ici !</button>
+    <h1>CIEL Cyber Terminal v1.0</h1>
+    <p>Mission : Décryptez le code réseau avant la fin du temps imparti.</p>
+
+    <div class="terminal">
+        <div>[ SYSTEM STATUS : EN LIGNE ]</div>
+        <div>[ INDICE : Chiffre de César (Décalage de +1) ]</div>
+        <div><em>Exemple : A devient B, B devient C...</em></div>
+        
+        <div class="crypto-box" id="code-chiffre">IFMMP</div>
+        
+        <label for="reponse">ENTRER LE CODE DÉCRYPTÉ :</label><br><br>
+        <input type="text" id="reponse" placeholder="Votre réponse ici..." autocomplete="off">
+        <button id="btn-valider">VALIDER</button>
+
+        <div class="status" id="statut-message"></div>
+        <div style="margin-top: 10px;">Score de décryptage : <span id="cyber-score">0</span></div>
+    </div>
 
     <script>
-        // Le code JavaScript pour faire fonctionner le jeu ira ici
-        let score = 0;
-        const bouton = document.getElementById('bouton-clic');
-        const affichageScore = document.getElementById('score');
+        // Liste de mots et leurs versions chiffrées (Décalage +1)
+        // HELLO -> IFMMP | CIEL -> DJFM | ROBOT -> SPCPU | CYBER -> DZCFS
+        const missions = [
+            { chiffre: "IFMMP", correct: "HELLO" },
+            { chiffre: "DJFM", correct: "CIEL" },
+            { chiffre: "SPCPU", correct: "ROBOT" },
+            { chiffre: "DZCFS", correct: "CYBER" }
+        ];
 
-        bouton.addEventListener('click', () => {
-            score++;
-            affichageScore.textContent = score;
+        let missionActuelle = 0;
+        let score = 0;
+
+        const zoneCode = document.getElementById('code-chiffre');
+        const champReponse = document.getElementById('reponse');
+        const btnValider = document.getElementById('btn-valider');
+        const statutMessage = document.getElementById('statut-message');
+        const affichageScore = document.getElementById('cyber-score');
+
+        btnValider.addEventListener('click', () => {
+            let tentative = champReponse.value.toUpperCase().trim();
+            
+            if (tentative === missions[missionActuelle].correct) {
+                score += 10;
+                affichageScore.textContent = score;
+                statutMessage.style.color = "#00ff66";
+                statutMessage.textContent = "[ ACCÈS AUTORISÉ ] : Code correct ! Passage au niveau suivant...";
+                
+                // Passer à la mission suivante
+                missionActuelle++;
+                if (missionActuelle < missions.length) {
+                    setTimeout(() => {
+                        zoneCode.textContent = missions[missionActuelle].chiffre;
+                        champReponse.value = "";
+                        statutMessage.textContent = "";
+                    }, 1500);
+                } else {
+                    setTimeout(() => {
+                        zoneCode.textContent = "BRAVO !";
+                        statutMessage.textContent = "[ SYSTÈME TOTALEMENT HACKÉ ] Félicitations !";
+                        champReponse.style.display = "none";
+                        btnValider.style.display = "none";
+                    }, 1500);
+                }
+            } else {
+                statutMessage.style.color = "#ff3333";
+                statutMessage.textContent = "[ ACCÈS REFUSÉ ] : Code erroné. Réessayez.";
+            }
         });
     </script>
 
